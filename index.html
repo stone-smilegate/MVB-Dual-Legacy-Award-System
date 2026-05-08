@@ -5,22 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MVB: Dual Legacy Award System</title>
     <style>
-        /* 1. 기본 스타일: 모든 여백 제거 및 박스 모델 설정 */
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
             background-color: #000;
             color: #fff;
             font-family: 'Apple SD Gothic Neo', sans-serif;
             overflow-x: hidden;
-            width: 100%;
+            /* 페이지 최하단 여백 완전 제거 */
+            padding-bottom: 0;
         }
 
-        /* 2. 헤더: 초기에는 보이지 않음 */
+        /* 헤더: 첫 번째 영상 이후 등장 */
         header {
             position: fixed;
             top: 0;
@@ -33,157 +29,117 @@
             justify-content: center;
             opacity: 0;
             visibility: hidden;
-            transform: translateY(-100%); /* 위로 숨김 */
+            transform: translateY(-100%);
             transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* 스크롤 시 나타나는 클래스 */
         header.active {
             opacity: 1;
             visibility: visible;
             transform: translateY(0);
         }
 
-        .header-inner {
-            width: 95%; /* 바디와 일치시킨 가로폭 */
-            display: flex;
-            align-items: center;
-        }
-
+        .header-inner { width: 80%; display: flex; align-items: center; }
         .header-logo {
-            height: 30px;
+            /* 1. 브라우저 너비(vw)에 비례하게 설정 (예: 화면 너비의 1.5%) */
+            height: 2vw; 
+            
+            /* 2. 너무 작아지거나 커지는 것을 방지하는 가이드라인 */
+            min-height: 30px; /* 모바일 등 작은 화면에서의 최소 크기 */
+            max-height: 45px; /* 큰 화면에서의 최대 크기 제한 */
+            
             width: auto;
             display: block;
+            transition: all 0.3s ease; /* 크기 변경 시 부드럽게 반응 */
         }
 
-        /* 3. 첫 번째 영상 섹션: Relative Full Screen (가로 100%) */
-        .hero-section {
-            width: 100%;
-            position: relative;
-            background: #000;
-            line-height: 0; /* 미세 유격 방지 */
+        /* 모바일 화면(768px 이하)에서 로고가 너무 작을 경우를 대비한 조정 */
+        @media (max-width: 768px) {
+            .header-logo {
+                height: 22px; /* 모바일에서는 고정 크기로 가독성 확보 */
+            }
         }
 
-        /* 16:9 비율 유지용 컨테이너 */
+        /* 첫 번째 영상 (Full Width) */
+        .hero-section { width: 100%; position: relative; background: #000; }
         .aspect-ratio-box {
             position: relative;
             width: 100%;
-            padding-top: 56.25%; /* 16/9 = 0.5625 */
+            padding-top: 56.25%; /* 16:9 */
             overflow: hidden;
         }
-
         .aspect-ratio-box iframe {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            border: none;
+            top: 0; left: 0; width: 100%; height: 100%; border: none;
         }
 
-        /* 4. 바디 컨텐츠: 가로폭 80% */
+        /* 바디 컨텐츠 (80% Width) */
         .content-container {
             width: 80%;
             margin: 0 auto;
-            padding: 50px 0;
+            /* 상단 여백은 유지, 하단 여백은 제거 */
+            padding: 80px 0 0 0; 
         }
 
-        section {
-            width: 100%;
-            margin-bottom: 120px;
+        /* 마지막 섹션의 아래 여백을 0으로 만들어 페이지 끝에 밀착 */
+        section { 
+            width: 100%; 
+            margin-bottom: 100px; 
+            line-height: 0; /* 이미지 하단 미세 공백 제거 */
+        }
+        
+        section:last-child {
+            margin-bottom: 0;
         }
 
-        .image-box img {
-            width: 100%;
-            height: auto;
-            display: block;
+        .image-box img { 
+            width: 100%; 
+            height: auto; 
+            display: block; 
         }
 
-        footer {
-            padding: 0px 0 120px 0; /* 상단 80px, 하단 120px로 대폭 축소 */
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            background-color: #000;
-        }
-
-        .footer-link {
-            display: inline-block;
-            text-decoration: none; /* 링크 밑줄 제거 */
-            cursor: pointer;
-        }
-
-        .footer-logo {
-            width: 500px;
-            max-width: 100%;
-            height: auto;
-            opacity: 0.8;
-            transition: opacity 0.3s ease; /* 마우스 올렸을 때 부드러운 변화 */
-        }
-
-        .footer-logo:hover {
-            opacity: 1; /* 마우스 올리면 선명해짐 */
-        }
     </style>
 </head>
 <body>
 
-    <!-- 헤더 영역 -->
     <header id="main-header">
         <div class="header-inner">
             <img src="logo_top.png" alt="Header Logo" class="header-logo">
         </div>
     </header>
 
-    <!-- [1번 영상] 전체 화면 너비 사용 -->
+    <!-- 맨 위 영상 -->
     <div id="trigger-point" class="hero-section">
         <div class="aspect-ratio-box">
-            <iframe src="https://player.vimeo.com/video/1190321204?background=1&autoplay=1&loop=1&byline=0&title=0" 
-                    allow="autoplay; fullscreen"></iframe>
+            <iframe src="https://player.vimeo.com/video/1190321204?background=1&autoplay=1&loop=1&byline=0&title=0" allow="autoplay; fullscreen"></iframe>
         </div>
     </div>
 
-    <!-- [바디] 80% 너비 컨테이너 -->
+    <!-- 컨텐츠 컨테이너 -->
     <div class="content-container">
-        <!-- 첫 번째 사진 -->
         <section class="image-box">
-            <img src="photo1.jpg" alt="Award System Photo 1">
+            <img src="photo1.jpg" alt="Award System 1">
         </section>
 
-        <!-- 중간 영상 (80% 폭 내에서 비율 유지) -->
         <section class="aspect-ratio-box">
-            <iframe src="https://player.vimeo.com/video/1190321401?background=1&autoplay=1&loop=1&byline=0&title=0" 
-                    allow="autoplay; fullscreen"></iframe>
+            <iframe src="https://player.vimeo.com/video/1190321401?background=1&autoplay=1&loop=1&byline=0&title=0" allow="autoplay; fullscreen"></iframe>
         </section>
 
-        <!-- 두 번째 사진 -->
+        <!-- 마지막 이미지: 여기서 페이지가 끝남 -->
         <section class="image-box">
-            <img src="photo2.jpg" alt="Award System Photo 2">
+            <img src="photo2.jpg" alt="Award System 2">
         </section>
     </div>
 
-    <!-- 바텀 영역 -->
-    <footer>
-        <!-- href="연결하고 싶은 주소"를 입력하세요 -->
-        <a href="https://www.behance.net/gallery/248972801/MVB-Dual-Legacy-Award-System" target="_blank" class="footer-link">
-            <img src="logo_bottom.png" alt="Footer Logo" class="footer-logo">
-        </a>
-    </footer>
-
     <script src="https://player.vimeo.com/api/player.js"></script>
-
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const header = document.getElementById('main-header');
             const trigger = document.getElementById('trigger-point');
 
             const handleScroll = () => {
-                // 첫 번째 영상 섹션의 하단 위치를 실시간으로 측정
                 const rect = trigger.getBoundingClientRect();
-                
-                // 창 크기와 관계없이 첫 번째 영상의 하단이 브라우저 최상단에 닿거나 넘어가면 노출
-                // 여유값(-10)을 주어 더 매끄럽게 처리
+                // 첫 영상 하단이 브라우저 상단에 닿으면 헤더 활성화
                 if (rect.bottom <= 10) {
                     header.classList.add('active');
                 } else {
@@ -191,9 +147,7 @@
                 }
             };
 
-            // 스크롤 이벤트 등록
             window.addEventListener('scroll', handleScroll);
-            // 창 크기가 바뀔 때를 대비해 한 번 더 체크
             window.addEventListener('resize', handleScroll);
         });
     </script>
